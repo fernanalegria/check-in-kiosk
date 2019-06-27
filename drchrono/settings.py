@@ -13,7 +13,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -24,7 +23,6 @@ SECRET_KEY = '=*l&a&rk7jmiw$3euke*z9lu-na!^j^i&ddejfik!ajqlaymmc'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -38,6 +36,7 @@ INSTALLED_APPS = (
     'drchrono',
     'social_django',
     'rest_framework',
+    'webpack_loader',
 )
 
 MIDDLEWARE = (
@@ -60,7 +59,7 @@ ROOT_URLCONF = 'drchrono.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates').replace('\\','/'),],
+        'DIRS': [os.path.join(BASE_DIR, 'templates').replace('\\', '/'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'drchrono.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
@@ -90,7 +88,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -105,11 +102,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 STATIC_URL = '/static/'
-
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'frontend'),
+)
 
 # TODO: Configure your drchrono.com account's API settings to allow this app access
 # 1) go to https://app.drchrono.com/api-management/
@@ -122,12 +120,10 @@ STATIC_URL = '/static/'
 SOCIAL_AUTH_DRCHRONO_KEY = os.getenv('SOCIAL_AUTH_CLIENT_ID')
 SOCIAL_AUTH_DRCHRONO_SECRET = os.getenv('SOCIAL_AUTH_SECRET')
 
-
 LOGIN_REDIRECT_URL = '/welcome/'
 LOGIN_URL = 'login/drchrono'
 
 SHELL_PLUS = "ipython"
-
 
 LOGGING = {
     'version': 1,
@@ -146,4 +142,11 @@ LOGGING = {
             'propagate': True,
         },
     },
+}
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
 }

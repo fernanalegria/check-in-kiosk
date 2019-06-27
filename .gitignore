@@ -97,3 +97,4 @@ docker/environment
 
 # IDEs and editors
 .vscode/
+.idea/

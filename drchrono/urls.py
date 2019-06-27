@@ -1,15 +1,13 @@
-from django.conf.urls import include, url
-from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
 from django.contrib import admin
-admin.autodiscover()
+from django.urls import include, path
 
 from drchrono import views
 
+admin.autodiscover()
 
 urlpatterns = [
-    url(r'^setup/$', views.SetupView.as_view(), name='setup'),
-    url(r'^welcome/$', views.DoctorWelcome.as_view(), name='setup'),
-    # url(r'^admin/', include(admin.site.urls)),
-    url(r'', include('social.apps.django_app.urls', namespace='social')),
+    path('setup/', views.SetupView.as_view(), name='setup'),
+    path('welcome/', views.DoctorWelcome.as_view(), name='setup'),
+    path('admin/', admin.site.urls),
+    path('', include('social.apps.django_app.urls', namespace='social')),
 ]

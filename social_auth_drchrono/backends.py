@@ -1,7 +1,8 @@
 import os
 from social.backends.oauth import BaseOAuth2
 
-class drchronoOAuth2(BaseOAuth2):
+
+class DrChronoOAuth2(BaseOAuth2):
     """
     drchrono OAuth authentication backend
     """
@@ -16,13 +17,14 @@ class drchronoOAuth2(BaseOAuth2):
         ('refresh_token', 'refresh_token'),
         ('expires_in', 'expires_in')
     ]
+
     # TODO: setup proper token refreshing
 
     def get_user_details(self, response):
         """
         Return user details from drchrono account
         """
-        return {'username': response.get('username'),}
+        return {'username': response.get('username'), }
 
     def user_data(self, access_token, *args, **kwargs):
         """

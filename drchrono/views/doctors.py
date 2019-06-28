@@ -1,15 +1,37 @@
-from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from social_django.models import UserSocialAuth
+from rest_framework.exceptions import (PermissionDenied, NotFound, ValidationError)
 
-from drchrono.endpoints import DoctorEndpoint
+from .base.viewsets import BaseReadOnlyModelViewSet
+from .base.endpoints import BaseEndpoint
+from drchrono.exceptions import Conflict
+
+ERROR_CODES = {
+    400: ValidationError,
+    403: PermissionDenied,
+    404: NotFound,
+    409: Conflict,
+}
 
 
-class SetupView(TemplateView):
+class DoctorsViewSet(BaseReadOnlyModelViewSet):
     """
-    The beginning of the OAuth sign-in flow. Logs a user into the kiosk, and saves the token.
+    API endpoint that allows groups to be viewed or edited.
     """
-    template_name = 'kiosk_setup.html'
+    endpoint = 'doctors'
+
+
+class DoctorEndpoint(BaseEndpoint):
+    endpoint = "doctors"
+
+    def update(self, id, data, partial=True, **kwargs):
+        raise NotImplementedError("the API does not allow updating doctors")
+
+    def create(self, data=None, json=None, **kwargs):
+        raise NotImplementedError("the API does not allow creating doctors")
+
+    def delete(self, id, **kwargs):
+        raise NotImplementedError("the API does not allow deleteing doctors")
 
 
 class DoctorWelcome(TemplateView):
@@ -46,4 +68,3 @@ class DoctorWelcome(TemplateView):
         doctor_details = self.make_api_request()
         kwargs['doctor'] = doctor_details
         return kwargs
-

@@ -2,16 +2,20 @@ import requests
 import logging
 
 
-class APIException(Exception): pass
+class APIException(Exception):
+    pass
 
 
-class Forbidden(APIException): pass
+class Forbidden(APIException):
+    pass
 
 
-class NotFound(APIException): pass
+class NotFound(APIException):
+    pass
 
 
-class Conflict(APIException): pass
+class Conflict(APIException):
+    pass
 
 
 ERROR_CODES = {
@@ -21,7 +25,6 @@ ERROR_CODES = {
 }
 
 
-# TODO: this API abstraction is included for your convenience. If you don't like it, feel free to change it.
 class BaseEndpoint(object):
     """
     A python wrapper for the basic rules of the drchrono API endpoints.
@@ -74,7 +77,7 @@ class BaseEndpoint(object):
         returns the JSON content or raises an exception, based on what kind of response (2XX/4XX) we get
         """
         if response.ok:
-            if response.status_code != 204: # No Content
+            if response.status_code != 204:  # No Content
                 return response.json()
         else:
             exe = ERROR_CODES.get(response.status_code, APIException)
@@ -175,44 +178,3 @@ class BaseEndpoint(object):
         self.auth_headers(kwargs)
         response = requests.delete(url)
         return self.json_or_exception(response)
-
-
-class PatientEndpoint(BaseEndpoint):
-    endpoint = "patients"
-
-
-class AppointmentEndpoint(BaseEndpoint):
-    endpoint = "appointments"
-
-    # Special parameter requirements for a given resource should be explicitly called out
-    def list(self, params=None, date=None, start=None, end=None, **kwargs):
-        """
-        List appointments on a given date, or between two dates
-        """
-        # Just parameter parsing & checking
-        params = params or {}
-        if start and end:
-            date_range = "{}/{}".format(start, end)
-            params['date_range'] = date_range
-        elif date:
-            params['date'] = date
-        if 'date' not in params and 'date_range' not in params:
-            raise Exception("Must provide either start & end, or date argument")
-        return super(AppointmentEndpoint, self).list(params, **kwargs)
-
-
-class DoctorEndpoint(BaseEndpoint):
-    endpoint = "doctors"
-
-    def update(self, id, data, partial=True, **kwargs):
-        raise NotImplementedError("the API does not allow updating doctors")
-
-    def create(self, data=None, json=None, **kwargs):
-        raise NotImplementedError("the API does not allow creating doctors")
-
-    def delete(self, id, **kwargs):
-        raise NotImplementedError("the API does not allow deleteing doctors")
-
-
-class AppointmentProfileEndpoint(BaseEndpoint):
-    endpoint = "appointment_profiles"

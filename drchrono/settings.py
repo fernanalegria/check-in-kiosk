@@ -47,6 +47,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'drchrono.middleware.SocialAuthTokenMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (

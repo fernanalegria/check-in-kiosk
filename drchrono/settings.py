@@ -47,10 +47,11 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'drchrono.middleware.SocialAuthTokenMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
-    'social_auth_drchrono.backends.drchronoOAuth2',
+    'social_auth_drchrono.backends.DrChronoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -149,4 +150,10 @@ WEBPACK_LOADER = {
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }

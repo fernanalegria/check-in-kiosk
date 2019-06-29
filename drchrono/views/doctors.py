@@ -16,7 +16,7 @@ ERROR_CODES = {
 
 class DoctorsViewSet(BaseReadOnlyModelViewSet):
     """
-    API endpoint that allows groups to be viewed or edited.
+    API endpoint to perform read operations with doctors
     """
     endpoint = 'doctors'
 

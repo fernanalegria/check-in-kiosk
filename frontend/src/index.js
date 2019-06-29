@@ -14,4 +14,6 @@ const RootHtml = () => (
   </Provider>
 );
 
+export const rootUrl = '';
+
 ReactDOM.render(<RootHtml />, document.getElementById('react-app'));

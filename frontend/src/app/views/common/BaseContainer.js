@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 
 const BaseContainer = ({ children }) => (
   <Container className="h-100 vertical-center">
-    <Row className="w-100">
+    <Row className="w-100 justify-content-center">
       <Col md="6" className="col-center">
         {children}
       </Col>

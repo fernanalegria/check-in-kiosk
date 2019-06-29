@@ -1,5 +1,8 @@
 import * as types from './types';
-import { getAppointments } from '../../../../server/api';
+import {
+  getAppointments,
+  updateAppointmentStatus
+} from '../../../../server/api';
 
 /**
  * Calls the API to fetch today's appointments and saves them into the Redux store
@@ -20,4 +23,26 @@ export const handleFetchAppointments = date => (dispatch, getState) => {
 export const receiveAppointments = appointments => ({
   type: types.RECEIVE_APPOINTMENTS,
   appointments
+});
+
+/**
+ * Calls the API to update the appointment status
+ * @returns  {Promise}
+ */
+export const handleUpdateAppointmentStatus = (id, status) => dispatch => {
+  return updateAppointmentStatus(id, status).then(() => {
+    dispatch(updateStatus(id, status));
+  });
+};
+
+/**
+ * Update the appointment status in the Redux store
+ * @param  {number} id
+ * @param  {string} status
+ * @returns  {Object} Action
+ */
+export const updateStatus = (id, status) => ({
+  type: types.UPDATE_STATUS,
+  id,
+  status
 });

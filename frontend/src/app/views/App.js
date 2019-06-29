@@ -7,7 +7,10 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faPowerOff,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faHandshake,
+  faCalendarTimes,
+  faCheckSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { rootUrl } from '../../index';
 import { authedUserActions, appointmentActions } from '../state/ducks';
@@ -15,9 +18,9 @@ import { formatDate } from '../utils/helpers';
 
 class App extends Component {
   componentDidMount() {
-    this.props.handleFetchUser().then(() => {
+    this.props.fetchUser().then(() => {
       const date = formatDate(new Date());
-      this.props.handleFetchAppointments(date);
+      this.props.fetchAppointments(date);
     });
   }
 
@@ -43,10 +46,19 @@ const mapStateToProps = ({ authedUser }) => ({
 });
 
 const mapDispatchToProps = {
-  handleFetchUser: () => authedUserActions.handleFetchUser(),
-  handleFetchAppointments: date => appointmentActions.handleFetchAppointments(date)
+  fetchUser: () => authedUserActions.handleFetchUser(),
+  fetchAppointments: date => appointmentActions.handleFetchAppointments(date)
 };
 
-library.add([faPowerOff, faExclamationTriangle]);
+library.add([
+  faPowerOff,
+  faExclamationTriangle,
+  faHandshake,
+  faCalendarTimes,
+  faCheckSquare
+]);
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

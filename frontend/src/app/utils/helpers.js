@@ -44,3 +44,38 @@ export const computeWaitingTime = startDate => {
   var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
   return `${diffHrs}h ${diffMins}min`;
 };
+
+/**
+ * Checks if a given date is the same date as today
+ * @param  {string} dateString
+ * @returns  {boolean}
+ */
+export const isToday = dateString => {
+  const today = new Date();
+  const date = new Date(dateString);
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
+  return today - date === 0;
+};
+
+/**
+ * Converts an array of objects to an object of objects
+ * @param  {Array} array
+ * @param  {string} keyField
+ * @returns  {Object}
+ */
+export const arrayToObject = (array, keyField) =>
+  array.reduce((obj, item) => {
+    obj[item[keyField]] = item;
+    return obj;
+  }, {});
+
+/**
+ * Slices specific keys within an object
+ * @param  {Object} obj
+ * @param  {string} args
+ * @returns  {Object}
+ */
+export const pick = (obj, ...args) => ({
+  ...args.reduce((res, key) => ({ ...res, [key]: obj[key] }), {})
+});

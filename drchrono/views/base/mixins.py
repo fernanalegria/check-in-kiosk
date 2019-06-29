@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, status, exceptions
 from rest_framework.exceptions import (APIException, PermissionDenied, NotFound, ValidationError)
 from rest_framework.response import Response
 import requests
@@ -28,6 +28,7 @@ class BaseMixin(object):
     """
     BASE_URL = 'https://drchrono.com/api/'
     endpoint = ''
+    action = ''
 
     @property
     def logger(self):
@@ -52,25 +53,32 @@ class BaseMixin(object):
             'Authorization': f'Bearer {access_token}'
         })
 
-    def get_json_response(self, response, method):
+    def get_json_response(self, response):
         """
         Returns the JSON content or raises an exception, based on what kind of response (2XX/4XX) we get
         """
         if response.ok:
-            self.logger.debug(f"{method}() complete")
-            return self.get_method_response(response)
+            self.logger.debug(f"{self.action}() complete")
+            mixin = self.get_mixin()
+            return mixin.get_method_response(response)
         else:
             exe = ERROR_CODES.get(response.status_code, APIException)
-            self.logger.debug(f"{method} exception {exe}")
+            self.logger.debug(f"{self.action} exception {exe}")
             raise exe(response.content)
 
-    @classmethod
-    def get_method_response(cls, response):
-        """
-        Specifies the data and the status a method should return
-        """
-        result = response.json()
-        return Response(result, status.HTTP_200_OK)
+    def get_mixin(self):
+        if self.action == 'retrieve':
+            return BaseRetrieveModelMixin
+        elif self.action == 'list':
+            return BaseListModelMixin
+        elif self.action == 'create':
+            return BaseCreateModelMixin
+        elif self.action == 'destroy':
+            return BaseDestroyModelMixin
+        elif self.action == 'update' or self.action == 'partial_update':
+            return BaseUpdateModelMixin
+        else:
+            raise exceptions.APIException('Unknown viewset action')
 
 
 class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
@@ -90,10 +98,10 @@ class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
         url = self.url()
         self.auth_headers(kwargs, request.access_token)
         response = requests.post(url, data=request.data, **kwargs)
-        return self.get_json_response(response, 'create')
+        return self.get_json_response(response)
 
-    @classmethod
-    def get_method_response(cls, response):
+    @staticmethod
+    def get_method_response(response):
         """
         Specifies the data and the status a method should return
         """
@@ -101,7 +109,7 @@ class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
         return Response(result, status.HTTP_201_CREATED)
 
 
-class BaseListModelMixin(mixins.ListModelMixin, viewsets.GenericViewSet, BaseMixin):
+class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
     """
     Retrieve a list of objects
     """
@@ -112,10 +120,10 @@ class BaseListModelMixin(mixins.ListModelMixin, viewsets.GenericViewSet, BaseMix
         self.auth_headers(kwargs, request.access_token)
         # Response will be one page out of a paginated results list
         response = requests.get(url, params=request.data, **kwargs)
-        return self.get_json_response(response, 'list')
+        return self.get_json_response(response)
 
-    @classmethod
-    def get_method_response(cls, response):
+    @staticmethod
+    def get_method_response(response):
         """
         Specifies the data and the status a method should return
         """
@@ -134,10 +142,10 @@ class BaseRetrieveModelMixin(mixins.RetrieveModelMixin, BaseMixin):
         self.auth_headers(kwargs, request.access_token)
         response = requests.get(url, params=request.data, **kwargs)
         self.logger.info("retrieve {}".format(response.status_code))
-        return self.get_json_response(response, 'retrieve')
+        return self.get_json_response(response)
 
-    @classmethod
-    def get_method_response(cls, response):
+    @staticmethod
+    def get_method_response(response):
         """
         Specifies the data and the status a method should return
         """
@@ -167,21 +175,16 @@ class BaseUpdateModelMixin(mixins.UpdateModelMixin, BaseMixin):
         partial = kwargs.pop('partial', False)
         url = self.url(pk)
         self.auth_headers(kwargs, request.access_token)
-        if partial:
-            method = 'partial_update'
-            make_request = requests.patch
-        else:
-            method = 'update'
-            make_request = requests.put
+        make_request = requests.patch if partial else requests.put
         response = make_request(url, request.data, **kwargs)
-        return self.get_json_response(response, method)
+        return self.get_json_response(response)
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
-    @classmethod
-    def get_method_response(cls, response):
+    @staticmethod
+    def get_method_response(response):
         """
         Specifies the data and the status a method should return
         """
@@ -204,10 +207,10 @@ class BaseDestroyModelMixin(mixins.DestroyModelMixin, BaseMixin):
         url = self.url(kwargs['pk'])
         self.auth_headers(kwargs, request.access_token)
         response = requests.delete(url)
-        return self.get_json_response(response, 'destroy')
+        return self.get_json_response(response)
 
-    @classmethod
-    def get_method_response(cls, response):
+    @staticmethod
+    def get_method_response(response):
         """
         Specifies the data and the status a method should return
         """

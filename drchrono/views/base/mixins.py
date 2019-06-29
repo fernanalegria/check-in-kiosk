@@ -15,6 +15,10 @@ ERROR_CODES = {
 }
 
 
+def normalize_list(array):
+    return {d['id']: d for d in array}
+
+
 class BaseMixin(object):
     """
     A basic mixin to connect to the DrChrono API.
@@ -59,24 +63,24 @@ class BaseMixin(object):
         """
         if response.ok:
             self.logger.debug(f"{self.action}() complete")
-            mixin = self.get_mixin()
-            return mixin.get_method_response(response)
+            response_function = self.get_response_function()
+            return response_function(response)
         else:
             exe = ERROR_CODES.get(response.status_code, APIException)
             self.logger.debug(f"{self.action} exception {exe}")
             raise exe(response.content)
 
-    def get_mixin(self):
+    def get_response_function(self):
         if self.action == 'retrieve':
-            return BaseRetrieveModelMixin
+            return self.get_retrieve_response
         elif self.action == 'list':
-            return BaseListModelMixin
+            return self.get_list_response
         elif self.action == 'create':
-            return BaseCreateModelMixin
+            return self.get_create_response
         elif self.action == 'destroy':
-            return BaseDestroyModelMixin
+            return self.get_destroy_response
         elif self.action == 'update' or self.action == 'partial_update':
-            return BaseUpdateModelMixin
+            return self.get_update_response
         else:
             raise APIException('Unknown viewset action')
 
@@ -100,8 +104,8 @@ class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
         response = requests.post(url, data=request.data, **kwargs)
         return self.get_json_response(response)
 
-    @staticmethod
-    def get_method_response(response):
+    @classmethod
+    def get_create_response(cls, response):
         """
         Specifies the data and the status a method should return
         """
@@ -120,7 +124,7 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
         url = self.url()
         self.auth_headers(kwargs, request.access_token)
         # Response will be one page out of a paginated results list
-        response = requests.get(url, params=request.data, **kwargs)
+        response = requests.get(url, params=request.GET.dict(), **kwargs)
         if self.left_joins:
             return self.get_join_response(response, kwargs)
         else:
@@ -133,7 +137,7 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
             url = f"{self.BASE_URL}{join_endpoint}"
             join_response = requests.get(url, **kwargs)
             secondary_results = self.get_json(join_response)
-            normalized_secondary_results = {d.pop("id"): d for d in map(dict, secondary_results)}
+            normalized_secondary_results = normalize_list(secondary_results)
             try:
                 results = [{**element, join_key: normalized_secondary_results[element[join_key]]}
                            for element in results]
@@ -141,7 +145,11 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
                 raise APIException(
                     'The second argument of the left_join tuple must be an existing property in the original list'
                 )
-        return Response(results, status.HTTP_200_OK)
+        try:
+            normalized_results = normalize_list(results)
+        except KeyError:
+            normalized_results = results
+        return Response(normalized_results, status.HTTP_200_OK)
 
     def get_json(self, response):
         if response.ok:
@@ -152,13 +160,17 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
             self.logger.debug(f"{self.action} exception {exe}")
             raise exe(response.content)
 
-    @staticmethod
-    def get_method_response(response):
+    @classmethod
+    def get_list_response(cls, response):
         """
         Specifies the data and the status a method should return
         """
         results = response.json()['results']
-        return Response(results, status.HTTP_200_OK)
+        try:
+            normalized_results = normalize_list(results)
+        except KeyError:
+            normalized_results = results
+        return Response(normalized_results, status.HTTP_200_OK)
 
 
 class BaseRetrieveModelMixin(mixins.RetrieveModelMixin, BaseMixin):
@@ -170,12 +182,12 @@ class BaseRetrieveModelMixin(mixins.RetrieveModelMixin, BaseMixin):
         pk = kwargs.pop('pk', None)
         url = self.url(pk)
         self.auth_headers(kwargs, request.access_token)
-        response = requests.get(url, params=request.data, **kwargs)
+        response = requests.get(url, params=request.GET.dict(), **kwargs)
         self.logger.info("retrieve {}".format(response.status_code))
         return self.get_json_response(response)
 
-    @staticmethod
-    def get_method_response(response):
+    @classmethod
+    def get_retrieve_response(cls, response):
         """
         Specifies the data and the status a method should return
         """
@@ -213,8 +225,8 @@ class BaseUpdateModelMixin(mixins.UpdateModelMixin, BaseMixin):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
-    @staticmethod
-    def get_method_response(response):
+    @classmethod
+    def get_update_response(cls, response):
         """
         Specifies the data and the status a method should return
         """
@@ -239,8 +251,8 @@ class BaseDestroyModelMixin(mixins.DestroyModelMixin, BaseMixin):
         response = requests.delete(url)
         return self.get_json_response(response)
 
-    @staticmethod
-    def get_method_response(response):
+    @classmethod
+    def get_destroy_response(cls, response):
         """
         Specifies the data and the status a method should return
         """

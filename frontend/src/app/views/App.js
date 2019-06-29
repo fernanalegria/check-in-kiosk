@@ -10,11 +10,15 @@ import {
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { rootUrl } from '../../index';
-import { authedUserActions } from '../state/ducks/authedUser';
+import { authedUserActions, appointmentActions } from '../state/ducks';
+import { formatDate } from '../utils/helpers';
 
 class App extends Component {
   componentDidMount() {
-    this.props.handleFetchUser();
+    this.props.handleFetchUser().then(() => {
+      const date = formatDate(new Date());
+      this.props.handleFetchAppointments(date);
+    });
   }
 
   render() {
@@ -39,7 +43,8 @@ const mapStateToProps = ({ authedUser }) => ({
 });
 
 const mapDispatchToProps = {
-  handleFetchUser: () => authedUserActions.handleFetchUser()
+  handleFetchUser: () => authedUserActions.handleFetchUser(),
+  handleFetchAppointments: date => appointmentActions.handleFetchAppointments(date)
 };
 
 library.add([faPowerOff, faExclamationTriangle]);

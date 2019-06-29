@@ -18,10 +18,10 @@ class UserViewSet(BaseListModelMixin, BaseGenericViewSet):
         self.auth_headers(kwargs, request.access_token)
         # Response will be one page out of a paginated results list
         response = requests.get(url, params=request.data, **kwargs)
-        return self.get_json_response(response, 'list')
+        return self.get_json_response(response)
 
     @classmethod
-    def get_method_response(cls, response):
+    def get_list_response(cls, response):
         """
         Specifies the data and the status a method should return
         """

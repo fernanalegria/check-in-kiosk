@@ -12,14 +12,6 @@ class UserViewSet(BaseListModelMixin, BaseGenericViewSet):
     """
     endpoint = 'doctors'
 
-    def list(self, request, *args, **kwargs):
-        self.logger.debug("list()")
-        url = self.url()
-        self.auth_headers(kwargs, request.access_token)
-        # Response will be one page out of a paginated results list
-        response = requests.get(url, params=request.data, **kwargs)
-        return self.get_json_response(response)
-
     @classmethod
     def get_list_response(cls, response):
         """

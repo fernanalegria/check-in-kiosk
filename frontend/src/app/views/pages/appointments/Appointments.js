@@ -22,7 +22,7 @@ class Appointments extends Component {
       },
       {
         dataField: 'waitingTime',
-        text: 'Waiting time'
+        text: 'Time in waiting room'
       },
       {
         dataField: 'actions',

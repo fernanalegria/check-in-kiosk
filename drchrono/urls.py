@@ -3,7 +3,11 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 from rest_framework import routers
 
-from drchrono.views import (DoctorsViewSet, PatientsViewSet, UserViewSet, AppointmentsViewSet)
+from drchrono.views import (DoctorsViewSet,
+                            PatientsViewSet,
+                            UserViewSet,
+                            AppointmentsViewSet,
+                            WaitingTimeViewSet)
 
 admin.autodiscover()
 
@@ -12,6 +16,7 @@ router.register(r'doctors', DoctorsViewSet, basename='doctors')
 router.register(r'patients', PatientsViewSet, basename='patients')
 router.register(r'user', UserViewSet, basename='user')
 router.register(r'appointments', AppointmentsViewSet, basename='appointments')
+router.register(r'waiting-time', WaitingTimeViewSet, basename='waiting-time')
 
 urlpatterns = [
     path('welcome/', TemplateView.as_view(template_name='index.html'), name='welcome'),

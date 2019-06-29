@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import mixins, status, exceptions
+from rest_framework import mixins, status
 from rest_framework.exceptions import (APIException, PermissionDenied, NotFound, ValidationError)
 from rest_framework.response import Response
 import requests
@@ -78,7 +78,7 @@ class BaseMixin(object):
         elif self.action == 'update' or self.action == 'partial_update':
             return BaseUpdateModelMixin
         else:
-            raise exceptions.APIException('Unknown viewset action')
+            raise APIException('Unknown viewset action')
 
 
 class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
@@ -113,6 +113,7 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
     """
     Retrieve a list of objects
     """
+    left_joins = []
 
     def list(self, request, *args, **kwargs):
         self.logger.debug("list()")
@@ -120,7 +121,36 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
         self.auth_headers(kwargs, request.access_token)
         # Response will be one page out of a paginated results list
         response = requests.get(url, params=request.data, **kwargs)
-        return self.get_json_response(response)
+        if self.left_joins:
+            return self.get_join_response(response, kwargs)
+        else:
+            return self.get_json_response(response)
+
+    def get_join_response(self, response, kwargs):
+        results = self.get_json(response)
+        for left_join in self.left_joins:
+            join_endpoint, join_key = left_join
+            url = f"{self.BASE_URL}{join_endpoint}"
+            join_response = requests.get(url, **kwargs)
+            secondary_results = self.get_json(join_response)
+            normalized_secondary_results = {d.pop("id"): d for d in map(dict, secondary_results)}
+            try:
+                results = [{**element, join_key: normalized_secondary_results[element[join_key]]}
+                           for element in results]
+            except KeyError:
+                raise APIException(
+                    'The second argument of the left_join tuple must be an existing property in the original list'
+                )
+        return Response(results, status.HTTP_200_OK)
+
+    def get_json(self, response):
+        if response.ok:
+            self.logger.debug(f"{self.action}() complete")
+            return response.json()['results']
+        else:
+            exe = ERROR_CODES.get(response.status_code, APIException)
+            self.logger.debug(f"{self.action} exception {exe}")
+            raise exe(response.content)
 
     @staticmethod
     def get_method_response(response):

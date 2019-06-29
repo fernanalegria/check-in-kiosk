@@ -7,3 +7,4 @@ class AppointmentsViewSet(BaseRetrieveModelMixin, BaseListModelMixin, BaseUpdate
     API endpoint to read and update appointments
     """
     endpoint = 'appointments'
+    left_joins = [('patients', 'patient')]

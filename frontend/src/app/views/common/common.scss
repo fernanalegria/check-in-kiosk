@@ -1,0 +1,35 @@
+@import '../styles/colors.scss';
+
+.authed-user {
+  color: $white;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &.sm {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.dropdown-menu {
+  left: unset !important;
+  right: 0;
+}
+
+.dropdown.nav-item > a {
+  color: $white;
+}
+
+@media (min-width: 992px) {
+  .log-out {
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+  }
+}

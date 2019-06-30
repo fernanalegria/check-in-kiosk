@@ -30,12 +30,14 @@ class NavigationBar extends Component {
 
   render() {
     const {
-      authedUser: { first_name, last_name },
+      authedUser: { first_name, last_name, app },
       location: { pathname }
     } = this.props;
     return (
       <Navbar bg="dark" variant="dark" expand="lg">
-        <Navbar.Brand>Check-in Kiosk</Navbar.Brand>
+        <Navbar.Brand>
+          {app === 'dashboard' ? 'Doctor Dashboard' : 'Check-in Kiosk'}
+        </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Nav className="mr-auto">
@@ -64,7 +66,6 @@ class NavigationBar extends Component {
 }
 
 const mapStateToProps = ({ authedUser }) => {
-  console.log('authedUser', authedUser);
   return {
     authedUser
   };

@@ -1,8 +1,26 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <script
+      type="text/javascript"
+      src="../../static/src/app/utils/setup.js"
+    ></script>
+    <style>
+      .btn {
+        margin: 5px;
+      }
+    </style>
+  </head>
   <body>
-    <a href="{% url 'social:begin' 'drchrono' %}">
-      Set up your Check-in kiosk by logging into drchrono!
-    </a>
+    <div>
+      <button class="btn" onclick="goToApp('dashboard')"
+        >Go to Doctor Dashboard</button
+      >
+    </div>
+    <div>
+      <button class="btn" onclick="goToApp('kiosk')"
+        >Go to Check-in Kiosk</button
+      >
+    </div>
   </body>
 </html>

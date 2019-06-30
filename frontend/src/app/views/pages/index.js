@@ -1,6 +1,6 @@
 import Appointments from './appointments';
 import AccessDenied from './AccessDenied';
-import Home from './Home';
+import Home from './home/Home';
 import LogoutSuccess from './LogoutSuccess';
 import NoMatch from './NoMatch';
 

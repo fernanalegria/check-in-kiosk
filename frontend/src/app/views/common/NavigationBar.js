@@ -34,7 +34,7 @@ class NavigationBar extends Component {
       location: { pathname }
     } = this.props;
     return (
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
         <Navbar.Brand>Check-in Kiosk</Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>

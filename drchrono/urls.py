@@ -3,7 +3,7 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from drchrono.views import (DoctorsViewSet, PatientsViewSet, UserViewSet, AppointmentsViewSet, WaitingTimeViewSet,
-                            DoctorWelcome, SetupView, LoginView, LogoutView)
+                            DoctorWelcome, SetupView, LoginView, LogoutView, PatientAppointmentsViewSet)
 
 admin.autodiscover()
 
@@ -12,6 +12,7 @@ router.register(r'doctors', DoctorsViewSet, basename='doctors')
 router.register(r'patients', PatientsViewSet, basename='patients')
 router.register(r'user', UserViewSet, basename='user')
 router.register(r'appointments', AppointmentsViewSet, basename='appointments')
+router.register(r'patient-appointments', PatientAppointmentsViewSet, basename='patient-appointments')
 router.register(r'waiting-time', WaitingTimeViewSet, basename='waiting-time')
 
 urlpatterns = [

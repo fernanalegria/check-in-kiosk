@@ -1,10 +1,10 @@
 from rest_framework import status, views, exceptions
 from rest_framework.response import Response
 from django.contrib.auth import logout
-import requests
+from django.http import QueryDict
 
 from .base.viewsets import BaseGenericViewSet
-from .base.mixins import BaseListModelMixin, ERROR_CODES
+from .base.mixins import BaseListModelMixin
 from drchrono.models import ClientApp
 
 
@@ -14,24 +14,14 @@ class UserViewSet(BaseListModelMixin, BaseGenericViewSet):
     """
     endpoint = 'doctors'
 
-    def list(self, request, *args, **kwargs):
-        self.logger.debug("list()")
-        url = self.url()
-        self.auth_headers(kwargs, request.access_token)
-        # Response will be one page out of a paginated results list
-        response = requests.get(url, **kwargs)
-        if response.ok:
-            self.logger.debug(f"{self.action}() complete")
-            result = response.json()['results'][0]
-            try:
-                result['app'] = ClientApp.objects.get(app_token=request.COOKIES['apptoken']).app
-            except ClientApp.DoesNotExist:
-                raise exceptions.PermissionDenied('Please, select which application you want to access in /setup/')
-            return Response(result, status.HTTP_200_OK)
-        else:
-            exe = ERROR_CODES.get(response.status_code, exceptions.APIException)
-            self.logger.debug(f"{self.action} exception {exe}")
-            raise exe(response.content)
+    @classmethod
+    def before_list_request(cls, request):
+        """
+        Performs validations and edits the query params
+        """
+        cls.app_token = request.COOKIES['apptoken']
+        if len(request.GET) > 0:
+            request.GET = QueryDict()
 
     @classmethod
     def get_list_response(cls, response):
@@ -39,7 +29,10 @@ class UserViewSet(BaseListModelMixin, BaseGenericViewSet):
         Specifies the data and the status a method should return
         """
         result = response.json()['results'][0]
-
+        try:
+            result['app'] = ClientApp.objects.get(app_token=cls.app_token).app
+        except ClientApp.DoesNotExist:
+            raise exceptions.PermissionDenied('Please, select which application you want to access in /setup/')
         return Response(result, status.HTTP_200_OK)
 
 
@@ -68,4 +61,4 @@ class LoginView(views.APIView):
             client_app = ClientApp(app_token=app_token)
         client_app.app = pk
         client_app.save()
-        return Response(status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -28,13 +28,24 @@ class App extends Component {
   componentDidMount() {
     this.props.fetchUser().then(() => {
       this.setState({ first: false });
-      const date = formatDate(new Date());
-      Promise.all([
-        this.props.fetchAppointments(date),
-        this.props.fetchWaitingTime()
-      ]);
+      this.fetchInitialData();
+      this.dataPolling = setInterval(() => {
+        this.fetchInitialData();
+      }, 2000);
     });
   }
+
+  componentWillUnmount() {
+    clearInterval(this.dataPolling);
+  }
+
+  fetchInitialData = () => {
+    const date = formatDate(new Date());
+    Promise.all([
+      this.props.fetchAppointments(date),
+      this.props.fetchWaitingTime()
+    ]);
+  };
 
   render() {
     return (

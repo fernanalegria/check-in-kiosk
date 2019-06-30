@@ -18,6 +18,13 @@ const getCookie = name => {
   }
 };
 
+const get = (url, params) => {
+  url.search = new URLSearchParams(params);
+  return fetch(url, {
+    headers
+  }).then(res => res.json());
+};
+
 export const getUser = () => {
   return fetch(`${rootUrl}/user/`, { headers }).then(res => res.json());
 };
@@ -25,10 +32,7 @@ export const getUser = () => {
 export const getAppointments = (date, doctor) => {
   const url = new URL(`${rootUrl}/appointments/`);
   const params = { date, doctor, show_archived: false };
-  url.search = new URLSearchParams(params);
-  return fetch(url, {
-    headers
-  }).then(res => res.json());
+  return get(url, params);
 };
 
 export const updateAppointmentStatus = (appointmentId, status) => {
@@ -42,4 +46,10 @@ export const updateAppointmentStatus = (appointmentId, status) => {
     },
     body: JSON.stringify(data)
   });
+};
+
+export const getWaitingTime = doctor => {
+  const url = new URL(`${rootUrl}/waiting-time/`);
+  const params = { doctor, show_archived: false };
+  return get(url, params);
 };

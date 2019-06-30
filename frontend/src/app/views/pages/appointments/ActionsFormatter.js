@@ -33,6 +33,9 @@ class ActionsFormatter extends Component {
 
   render() {
     const { status } = this.props.appointment;
+    const actionStatus = ['Arrived', 'Scheduled', 'In Session'];
+    const statusSet = new Set(actionStatus);
+    statusSet.add(status);
     return (
       <ButtonToolbar>
         {status === 'Arrived' && (
@@ -63,6 +66,7 @@ class ActionsFormatter extends Component {
             }}
           />
         )}
+        {statusSet.size !== actionStatus.length && 'No possible actions'}
       </ButtonToolbar>
     );
   }

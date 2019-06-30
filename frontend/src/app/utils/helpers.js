@@ -39,9 +39,9 @@ export const formatDate = d => {
  */
 export const computeWaitingTime = startDate => {
   const today = new Date();
-  var diffMs = today - new Date(startDate);
-  var diffHrs = Math.floor((diffMs % 86400000) / 3600000);
-  var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+  const diffMs = today - new Date(`${startDate}-04:00`);
+  const diffHrs = Math.floor((diffMs % 86400000) / 3600000);
+  const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
   return `${diffHrs}h ${diffMins}min`;
 };
 
@@ -79,3 +79,9 @@ export const arrayToObject = (array, keyField) =>
 export const pick = (obj, ...args) => ({
   ...args.reduce((res, key) => ({ ...res, [key]: obj[key] }), {})
 });
+
+export const formatWaitingTime = time => {
+  const dateTimeSplit = time.split(', ');
+  const timeSplit = dateTimeSplit[1].split(':');
+  return `${dateTimeSplit[0]} ${timeSplit[0]} h ${timeSplit[1]} min`;
+};

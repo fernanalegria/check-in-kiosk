@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ActionsFormatter from './ActionsFormatter';
 import { computeWaitingTime } from '../../../utils/helpers';
 import { connect } from 'react-redux';
+import WaitingTimeForm from './WaitingTimeForm';
 
 class Appointments extends Component {
   constructor() {
@@ -51,11 +52,14 @@ class Appointments extends Component {
   render() {
     const { appointments } = this.props;
     return (
-      <BootstrapTable
-        keyField="id"
-        data={appointments}
-        columns={this.columns}
-      />
+      <Fragment>
+        <BootstrapTable
+          keyField="id"
+          data={appointments}
+          columns={this.columns}
+        />
+        <WaitingTimeForm />
+      </Fragment>
     );
   }
 }

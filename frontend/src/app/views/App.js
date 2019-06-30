@@ -13,14 +13,21 @@ import {
   faCheckSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { rootUrl } from '../../index';
-import { authedUserActions, appointmentActions } from '../state/ducks';
+import {
+  authedUserActions,
+  appointmentActions,
+  waitingTimeActions
+} from '../state/ducks';
 import { formatDate } from '../utils/helpers';
 
 class App extends Component {
   componentDidMount() {
     this.props.fetchUser().then(() => {
       const date = formatDate(new Date());
-      this.props.fetchAppointments(date);
+      Promise.all([
+        this.props.fetchAppointments(date),
+        this.props.fetchWaitingTime()
+      ]);
     });
   }
 
@@ -47,7 +54,8 @@ const mapStateToProps = ({ authedUser }) => ({
 
 const mapDispatchToProps = {
   fetchUser: () => authedUserActions.handleFetchUser(),
-  fetchAppointments: date => appointmentActions.handleFetchAppointments(date)
+  fetchAppointments: date => appointmentActions.handleFetchAppointments(date),
+  fetchWaitingTime: () => waitingTimeActions.handleFetchWaitingTime()
 };
 
 library.add([

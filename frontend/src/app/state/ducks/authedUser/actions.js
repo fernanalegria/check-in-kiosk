@@ -1,5 +1,5 @@
 import * as types from './types';
-import { getUser } from '../../../../server/api';
+import { getUser, logOut } from '../../../../server/api';
 import { showLoading, hideLoading } from 'react-redux-loading';
 
 /**
@@ -32,10 +32,11 @@ const unsetAuthedUser = () => ({
 });
 
 /**
- * Handles the asynchronous user removal
+ * Handles the asynchronous user log out
  * @returns  {Promise}
  */
-export const handleUnsetAuthedUser = () => dispatch => {
-  dispatch(unsetAuthedUser());
-  return Promise.resolve();
+export const handleLogOut = () => dispatch => {
+  return logOut().then(() => {
+    dispatch(unsetAuthedUser());
+  });
 };

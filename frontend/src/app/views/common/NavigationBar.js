@@ -22,9 +22,9 @@ class NavigationBar extends Component {
    * Logs the user out and redirects them to the login page
    */
   logOut = () => {
-    const { logOut } = this.props;
+    const { logOut, history } = this.props;
     logOut().then(() => {
-      // Show logout page
+      history.push(`${rootUrl}/logout-success`);
     });
   };
 
@@ -71,7 +71,7 @@ const mapStateToProps = ({ authedUser }) => {
 };
 
 const mapDispatchToProps = {
-  logOut: () => authedUserActions.handleUnsetAuthedUser()
+  logOut: () => authedUserActions.handleLogOut()
 };
 
 export default withRouter(

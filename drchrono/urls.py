@@ -1,13 +1,15 @@
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
 from rest_framework import routers
 
 from drchrono.views import (DoctorsViewSet,
                             PatientsViewSet,
                             UserViewSet,
                             AppointmentsViewSet,
-                            WaitingTimeViewSet)
+                            WaitingTimeViewSet,
+                            LogOutViewSet,
+                            DoctorWelcome
+                            )
 
 admin.autodiscover()
 
@@ -17,9 +19,10 @@ router.register(r'patients', PatientsViewSet, basename='patients')
 router.register(r'user', UserViewSet, basename='user')
 router.register(r'appointments', AppointmentsViewSet, basename='appointments')
 router.register(r'waiting-time', WaitingTimeViewSet, basename='waiting-time')
+router.register(r'logout', LogOutViewSet, basename='logout')
 
 urlpatterns = [
-    path('welcome/', TemplateView.as_view(template_name='index.html'), name='welcome'),
+    path('welcome/', DoctorWelcome.as_view(), name='welcome'),
     path('admin/', admin.site.urls),
     path('', include('social.apps.django_app.urls', namespace='social')),
     path('', include(router.urls)),

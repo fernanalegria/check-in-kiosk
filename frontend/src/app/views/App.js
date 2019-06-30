@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Home from './pages/Home';
-import NoMatch from './pages/NoMatch';
+import { Home, NoMatch, AccessDenied, LogoutSuccess } from './pages';
+import ProtectedRoute from './common/ProtectedRoute';
 import LoadingBar from 'react-redux-loading';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
@@ -21,8 +21,13 @@ import {
 import { formatDate } from '../utils/helpers';
 
 class App extends Component {
+  state = {
+    first: true
+  };
+
   componentDidMount() {
     this.props.fetchUser().then(() => {
+      this.setState({ first: false });
       const date = formatDate(new Date());
       Promise.all([
         this.props.fetchAppointments(date),
@@ -36,9 +41,17 @@ class App extends Component {
       <Router>
         <div className="app">
           <LoadingBar className="initial-loading-bar" scope="initial" />
-          {!this.props.loading && (
+          {!this.props.loading && !this.state.first && (
             <Switch>
-              <Route path={`${rootUrl}/(welcome)/`} component={Home} />
+              <ProtectedRoute path={`${rootUrl}/(welcome)/`} component={Home} />
+              <Route
+                path={`${rootUrl}/access-denied/`}
+                component={AccessDenied}
+              />
+              <Route
+                path={`${rootUrl}/logout-success/`}
+                component={LogoutSuccess}
+              />
               <Route component={NoMatch} />
             </Switch>
           )}
@@ -48,8 +61,8 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = ({ authedUser }) => ({
-  loading: !authedUser
+const mapStateToProps = ({ loadingBar }) => ({
+  loading: loadingBar.initial === 1
 });
 
 const mapDispatchToProps = {

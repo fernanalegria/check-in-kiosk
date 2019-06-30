@@ -3,7 +3,7 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from drchrono.views import (DoctorsViewSet, PatientsViewSet, UserViewSet, AppointmentsViewSet, WaitingTimeViewSet,
-                            DoctorWelcome, SetupView, LoginView, LogoutView, PatientAppointmentsViewSet)
+                            DoctorWelcome, SetupView, LoginView, LogoutView, PatientAppointmentsViewSet, StaticView)
 
 admin.autodiscover()
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('welcome/', DoctorWelcome.as_view(), name='welcome'),
     path('logout/', LogoutView.as_view(), name='logout'),
     re_path(r'^app/(?P<pk>\D+)/$', LoginView.as_view(), name='app'),
+    path('static-data/', StaticView.as_view(), name='static-data'),
     path('admin/', admin.site.urls),
     path('', include('social.apps.django_app.urls', namespace='social')),
     path('', include(router.urls)),

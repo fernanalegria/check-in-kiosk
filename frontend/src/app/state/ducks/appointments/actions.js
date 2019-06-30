@@ -1,6 +1,7 @@
 import * as types from './types';
 import {
   getAppointments,
+  getApptsBySsn,
   updateAppointmentStatus
 } from '../../../../server/api';
 
@@ -46,3 +47,10 @@ export const updateStatus = (id, status) => ({
   id,
   status
 });
+
+export const handleFetchApptsBySsn = ssn => (dispatch, getState) => {
+  const { authedUser } = getState();
+  return getApptsBySsn(ssn, authedUser.id).then(appointments => {
+    dispatch(receiveAppointments(appointments));
+  });
+};

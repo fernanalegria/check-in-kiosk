@@ -47,7 +47,7 @@ class NavigationBar extends Component {
                 pathname === `${rootUrl}/welcome/` ? 'active' : ''
               }`}
             >
-              Today's Appointments
+              {app === 'dashboard' ? "Today's Appointments" : 'Check-in'}
             </Link>
           </Nav>
           <Nav className="justify-content-end">

@@ -10,7 +10,8 @@ import {
   faExclamationTriangle,
   faHandshake,
   faCalendarTimes,
-  faCheckSquare
+  faCheckSquare,
+  faSignInAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { rootUrl } from '../../index';
 import {
@@ -26,12 +27,14 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.props.fetchUser().then(() => {
+    this.props.fetchUser().then(user => {
       this.setState({ first: false });
-      this.fetchInitialData();
-      this.dataPolling = setInterval(() => {
+      if (user.app == 'dashboard') {
         this.fetchInitialData();
-      }, 2000);
+        this.dataPolling = setInterval(() => {
+          this.fetchInitialData();
+        }, 2000);
+      }
     });
   }
 
@@ -87,7 +90,8 @@ library.add([
   faExclamationTriangle,
   faHandshake,
   faCalendarTimes,
-  faCheckSquare
+  faCheckSquare,
+  faSignInAlt
 ]);
 
 export default connect(

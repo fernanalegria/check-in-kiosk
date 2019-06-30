@@ -35,6 +35,12 @@ export const getAppointments = (date, doctor) => {
   return get(url, params);
 };
 
+export const getApptsBySsn = (ssn, doctor) => {
+  const url = new URL(`${rootUrl}/patient-appointments/`);
+  const params = { social_security_number: ssn, doctor };
+  return get(url, params);
+};
+
 export const updateAppointmentStatus = (appointmentId, status) => {
   const url = new URL(`${rootUrl}/appointments/${appointmentId}/`);
   const data = { status };

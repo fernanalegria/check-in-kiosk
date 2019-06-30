@@ -1,11 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ActionsFormatter from './ActionsFormatter';
-import { computeWaitingTime } from '../../../utils/helpers';
+import SearchForm from './SearchForm';
 import { connect } from 'react-redux';
-import WaitingTimeForm from './WaitingTimeForm';
+import { isToday } from '../../../utils/helpers'
 
-class Appointments extends Component {
+/**
+ * Kiosks that allows patients to check in upon arrival
+ */
+class CheckInKiosk extends Component {
   constructor() {
     super();
     this.columns = [
@@ -22,10 +25,6 @@ class Appointments extends Component {
         text: 'Status'
       },
       {
-        dataField: 'waitingTime',
-        text: 'Time in waiting room'
-      },
-      {
         dataField: 'actions',
         text: 'Actions',
         isDummyField: true,
@@ -34,32 +33,19 @@ class Appointments extends Component {
     ];
   }
 
-  formatter = (cell, row) => (
-    <ActionsFormatter
-      appointment={row}
-      hasUncompletedSessions={this.hasUncompletedSessions}
-    />
-  );
-
-  hasUncompletedSessions = () => {
-    const { appointments } = this.props;
-    const uncompletedSessions = appointments.filter(
-      appointment => appointment.status === 'In Session'
-    );
-    return uncompletedSessions.length != 0;
-  };
+  formatter = (cell, row) => <ActionsFormatter appointment={row} />;
 
   render() {
     const { appointments } = this.props;
     return (
       <Fragment>
+        <SearchForm />
         <BootstrapTable
           keyField="id"
           data={appointments}
           columns={this.columns}
           noDataIndication="No data found"
         />
-        <WaitingTimeForm />
       </Fragment>
     );
   }
@@ -73,8 +59,8 @@ const mapStateToProps = ({ appointments }) => ({
       status: status ? status : 'Scheduled',
       patient: `${patient.first_name} ${patient.last_name}`,
       scheduledTime: scheduled_time.replace('T', ' '),
-      waitingTime: status === 'Arrived' ? computeWaitingTime(updated_at) : 'N/A'
+      isToday: isToday(scheduled_time)
     }))
 });
 
-export default connect(mapStateToProps)(Appointments);
+export default connect(mapStateToProps)(CheckInKiosk);

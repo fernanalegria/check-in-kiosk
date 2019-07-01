@@ -94,3 +94,13 @@ ENV/
 
 # secret environment stuff
 docker/environment
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Node.js modules
+node_modules/
+
+# Webpack
+webpack-stats.json

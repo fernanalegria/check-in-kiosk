@@ -16,7 +16,7 @@ export const handleFetchWaitingTime = () => (dispatch, getState) => {
 
 /**
  * Saves the waiting time in the Redux store
- * @param  {Object} user
+ * @param  {string} waitingTime
  * @returns  {Object} Action
  */
 export const receiveWaitingTime = waitingTime => ({

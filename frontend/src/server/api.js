@@ -64,3 +64,5 @@ export const logOut = () =>
   fetch(`${rootUrl}/logout/`, {
     headers
   });
+
+export const getStaticData = () => get(`${rootUrl}/static-data/`);

@@ -34,7 +34,7 @@ class NavigationBar extends Component {
       location: { pathname }
     } = this.props;
     return (
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
         <Navbar.Brand>
           {app === 'dashboard' ? 'Doctor Dashboard' : 'Check-in Kiosk'}
         </Navbar.Brand>

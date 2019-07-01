@@ -30,7 +30,14 @@ class CheckInModal extends Component {
   };
 
   checkZipCode = () => {
-    // Check if the zip code corresponds to the selected city
+    const { zipCode, city } = this.state;
+    let isInvalid = true;
+    if (city && city.length > 0) {
+      isInvalid = !(
+        zipCode >= city[0].zip_code_from && zipCode <= city[0].zip_code_to
+      );
+    }
+    return isInvalid;
   };
 
   render() {
@@ -80,10 +87,15 @@ class CheckInModal extends Component {
               <Form.Group as={Col} md="6" controlId="validationFormik03">
                 <Form.Label>City</Form.Label>
                 <Typeahead
+                  id="city-typeahead"
                   labelKey="city_name"
+                  placeholder="City"
                   multiple={false}
                   options={cityOptions}
-                  placeholder="State"
+                  selected={city}
+                  onChange={city => {
+                    this.setState({ city });
+                  }}
                 />
               </Form.Group>
               <Form.Group as={Col} md="3" controlId="validationFormik04">
@@ -91,6 +103,7 @@ class CheckInModal extends Component {
                 <Typeahead
                   id="state-typeahead"
                   labelKey="state_name"
+                  placeholder="State"
                   multiple={false}
                   options={Object.values(states)}
                   selected={state}
@@ -107,14 +120,17 @@ class CheckInModal extends Component {
                   name="zipCode"
                   value={zipCode}
                   onChange={this.onChange}
-                  isInvalid={this.checkZipCode()}
                 />
               </Form.Group>
             </Form.Row>
             <Button
               type="submit"
               disabled={
-                !address || state.length === 0 || city.length === 0 || !zipCode
+                !address ||
+                state.length === 0 ||
+                city.length === 0 ||
+                !zipCode ||
+                this.checkZipCode()
               }
             >
               Confirm and check in

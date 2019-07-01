@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal, Button, Form, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { appointmentActions } from '../../../state/ducks';
 
 class CheckInModal extends Component {
   state = {
@@ -22,7 +23,16 @@ class CheckInModal extends Component {
   }
 
   handleSubmit = () => {
-    // Update demographic info
+    const { address, city, state, zipCode } = this.state;
+    const { checkIn, patientId, appointmentId } = this.props;
+    checkIn(
+      appointmentId,
+      patientId,
+      address,
+      city[0].city_name,
+      state[0].state_code,
+      zipCode
+    );
   };
 
   onChange = e => {
@@ -149,7 +159,8 @@ const mapStateToProps = ({ appointments, states, cities }) => {
     state,
     zip_code,
     last_name,
-    first_name
+    first_name,
+    id
   } = Object.values(appointments)[0].patient;
   const stateObj = Object.values(states).find(st => st.state_code === state);
   const cityObj = Object.values(cities).find(ct => ct.city_name === city);
@@ -159,9 +170,25 @@ const mapStateToProps = ({ appointments, states, cities }) => {
     state: stateObj ? [stateObj] : [],
     zipCode: zip_code,
     patientName: `${first_name} ${last_name}`,
+    patientId: id,
     states,
     cities
   };
 };
 
-export default connect(mapStateToProps)(CheckInModal);
+const mapDispatchToProps = {
+  checkIn: (appointmentId, patientId, address, city, state, zipCode) =>
+    appointmentActions.handleCheckIn(
+      appointmentId,
+      patientId,
+      address,
+      city,
+      state,
+      zipCode
+    )
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CheckInModal);

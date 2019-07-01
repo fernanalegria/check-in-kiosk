@@ -27,6 +27,16 @@ const get = (url, params) => {
   }).then(res => res.json());
 };
 
+const patch = (url, data) =>
+  fetch(url, {
+    method: 'PATCH',
+    headers: {
+      ...headers,
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify(data)
+  });
+
 export const getUser = () => get(`${rootUrl}/user/`);
 
 export const getAppointments = (date, doctor) => {
@@ -41,17 +51,31 @@ export const getApptsBySsn = (ssn, doctor) => {
   return get(url, params);
 };
 
+export const getApptsByPatientId = (patient, doctor) => {
+  const url = new URL(`${rootUrl}/appointments/`);
+  const params = { patient, doctor };
+  return get(url, params);
+};
+
 export const updateAppointmentStatus = (appointmentId, status) => {
   const url = new URL(`${rootUrl}/appointments/${appointmentId}/`);
   const data = { status };
-  return fetch(url, {
-    method: 'PATCH',
-    headers: {
-      ...headers,
-      'X-CSRFToken': getCookie('csrftoken')
-    },
-    body: JSON.stringify(data)
-  });
+  if (status === 'Arrived') {
+    data.is_walk_in = true;
+  }
+  return patch(url, data);
+};
+
+export const updateDemographicInfo = (
+  patientId,
+  address,
+  city,
+  state,
+  zipCode
+) => {
+  const url = new URL(`${rootUrl}/patients/${patientId}/`);
+  const data = { address, city, state, zip_code: zipCode };
+  return patch(url, data);
 };
 
 export const getWaitingTime = doctor => {

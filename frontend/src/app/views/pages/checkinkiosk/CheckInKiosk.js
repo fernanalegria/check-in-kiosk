@@ -12,7 +12,7 @@ import { isToday } from '../../../utils/helpers';
 class CheckInKiosk extends Component {
   constructor() {
     super();
-    this.state = { modalShow: false };
+    this.state = { modalShow: false, appointmentId: null };
     this.columns = [
       {
         dataField: 'patient',
@@ -36,23 +36,19 @@ class CheckInKiosk extends Component {
   }
 
   formatter = (cell, row) => (
-    <ActionsFormatter
-      appointment={row}
-      openModal={() => {
-        this.changeModalState(true);
-      }}
-    />
+    <ActionsFormatter appointment={row} openModal={this.openModal} />
   );
 
-  changeModalState = modalShow => {
+  openModal = appointmentId => {
     this.setState({
-      modalShow
+      modalShow: true,
+      appointmentId
     });
   };
 
   render() {
     const { appointments } = this.props;
-    const { modalShow } = this.state;
+    const { modalShow, appointmentId } = this.state;
     return (
       <Fragment>
         <SearchForm />
@@ -65,9 +61,12 @@ class CheckInKiosk extends Component {
         {appointments.length > 0 && (
           <CheckInModal
             onHide={() => {
-              this.changeModalState(false);
+              this.setState({
+                modalShow: false
+              });
             }}
             show={modalShow}
+            appointmentId={appointmentId}
           />
         )}
       </Fragment>

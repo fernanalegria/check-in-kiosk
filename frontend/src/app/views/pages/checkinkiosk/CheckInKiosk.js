@@ -65,7 +65,7 @@ class CheckInKiosk extends Component {
         {appointments.length > 0 && (
           <CheckInModal
             onHide={() => {
-              this.changeModalState(true);
+              this.changeModalState(false);
             }}
             show={modalShow}
           />

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Modal, Button, Form, InputGroup, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 class CheckInModal extends Component {
   state = {
@@ -11,12 +12,12 @@ class CheckInModal extends Component {
   };
 
   componentDidMount() {
-    const { address, city, state, zip_code } = this.props.patient;
+    const { address, city, state, zipCode } = this.props;
     this.setState({
       address,
       city,
       state,
-      zipCode: zip_code
+      zipCode
     });
   }
 
@@ -24,18 +25,27 @@ class CheckInModal extends Component {
     // Update demographic info
   };
 
-  handleChange = (property, value) => {
-    this.setState({
-      property: value
-    });
+  onChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
+  checkZipCode = () => {
+    // Check if the zip code corresponds to the selected city
   };
 
   render() {
     const { address, city, state, zipCode } = this.state;
-    const { first_name, last_name } = this.props.patient;
+    const { patientName, states, cities, show, onHide } = this.props;
+    let cityOptions = Object.values(cities);
+    if (state && state.length >= 0) {
+      cityOptions = cityOptions.filter(
+        cityObj => cityObj.state === state[0].id
+      );
+    }
     return (
       <Modal
-        {...this.props}
+        show={show}
+        onHide={onHide}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -54,11 +64,7 @@ class CheckInModal extends Component {
             <Form.Row>
               <Form.Group as={Col} md="4" controlId="validationFormik01">
                 <Form.Label>Name</Form.Label>
-                <Form.Control
-                  plaintext
-                  readOnly
-                  defaultValue={`${first_name} ${last_name}`}
-                />
+                <Form.Control plaintext readOnly defaultValue={patientName} />
               </Form.Group>
               <Form.Group as={Col} md="8" controlId="validationFormik02">
                 <Form.Label>Address</Form.Label>
@@ -66,43 +72,53 @@ class CheckInModal extends Component {
                   type="text"
                   name="address"
                   value={address}
-                  onChange={e => this.handleChange('address', e.target.value)}
+                  onChange={this.onChange}
                 />
               </Form.Group>
             </Form.Row>
             <Form.Row>
               <Form.Group as={Col} md="6" controlId="validationFormik03">
                 <Form.Label>City</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="City"
-                  name="city"
-                  value={city}
-                  onChange={e => this.handleChange('city', e.target.value)}
+                <Typeahead
+                  labelKey="city_name"
+                  multiple={false}
+                  options={cityOptions}
+                  placeholder="State"
                 />
               </Form.Group>
               <Form.Group as={Col} md="3" controlId="validationFormik04">
                 <Form.Label>State</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="State"
-                  name="state"
-                  value={state}
-                  onChange={e => this.handleChange('state', e.target.value)}
+                <Typeahead
+                  id="state-typeahead"
+                  labelKey="state_name"
+                  multiple={false}
+                  options={Object.values(states)}
+                  selected={state}
+                  onChange={state => {
+                    this.setState({ state });
+                  }}
                 />
               </Form.Group>
               <Form.Group as={Col} md="3" controlId="validationFormik05">
                 <Form.Label>Zip</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Zip"
-                  name="zip"
+                  placeholder="Zip code"
+                  name="zipCode"
                   value={zipCode}
-                  onChange={e => this.handleChange('zip', e.target.value)}
+                  onChange={this.onChange}
+                  isInvalid={this.checkZipCode()}
                 />
               </Form.Group>
             </Form.Row>
-            <Button type="submit">Confirm and check in</Button>
+            <Button
+              type="submit"
+              disabled={
+                !address || state.length === 0 || city.length === 0 || !zipCode
+              }
+            >
+              Confirm and check in
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
@@ -110,8 +126,26 @@ class CheckInModal extends Component {
   }
 }
 
-const mapStateToProps = ({ appointments }) => ({
-  patient: Object.values(appointments)[0].patient
-});
+const mapStateToProps = ({ appointments, states, cities }) => {
+  const {
+    address,
+    city,
+    state,
+    zip_code,
+    last_name,
+    first_name
+  } = Object.values(appointments)[0].patient;
+  const stateObj = Object.values(states).find(st => st.state_code === state);
+  const cityObj = Object.values(cities).find(ct => ct.city_name === city);
+  return {
+    address,
+    city: cityObj ? [cityObj] : [],
+    state: stateObj ? [stateObj] : [],
+    zipCode: zip_code,
+    patientName: `${first_name} ${last_name}`,
+    states,
+    cities
+  };
+};
 
 export default connect(mapStateToProps)(CheckInModal);

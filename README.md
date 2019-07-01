@@ -62,12 +62,6 @@ This project has `social-auth` preconfigured for you. The `social_auth_drchrono/
 
 
 ### Dev environment Setup
-This project uses PostgresSQL, a back-end relational database, hosted on Heroku. If you want to test it with your one
-data, I recommend creating your own database and make and run Django migrations on it. If you decide to do so, you will
-have to pre-populate the master tables state and city.
-If you're familiar with it, docker should take care of all the dependencies for you. It will create one container with 
-all the python dependencies.The project uses SQLite3 as a database back-end, so you shouldn't need to mess with anything 
-to get django up and running. See `docker-compose.yml` for details.
 
 ``` 
 $ git clone https://github.com/fernanalegria/check-in-kiosk.git
@@ -83,8 +77,9 @@ $ Connect with a browser to http://localhost:8080/setup/ and select the app you 
 NOTE: The instructions above have been tested on Windows 10, these may differ slightly with the ones you should
 execute to get up and running in your operating system
 
-If you don't want to use docker, that's fine too! The project is fairly small and self-contained. You can probably get all
-the dependencies installed and running on your favorite platform with `pip install -r requirements.txt && python manage.py runserver`. You'll have to configure the `SOCIAL_AUTH_CLIENT_ID` and `SOCIAL_AUTH_SECRET` variables by hand, though.
+This project uses PostgresSQL, a back-end relational database, hosted on Heroku. If you want to test it with your one
+data, I recommend creating your own database and make and run Django migrations on it. If you decide to do so, you will
+have to pre-populate the master tables state and city.
 
 Once the dev server is running, connect with a browser to [http://localhost:8080/setup/]() and select the app you want to
 log in. You should see two options: the Doctor Dashboard and the Check-in Kiosk.

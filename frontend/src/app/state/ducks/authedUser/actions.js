@@ -11,6 +11,7 @@ export const handleFetchUser = () => dispatch => {
   return getUser().then(user => {
     dispatch(receiveUser(user));
     dispatch(hideLoading('initial'));
+    return user;
   });
 };
 

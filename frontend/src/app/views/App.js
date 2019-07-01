@@ -10,13 +10,15 @@ import {
   faExclamationTriangle,
   faHandshake,
   faCalendarTimes,
-  faCheckSquare
+  faCheckSquare,
+  faSignInAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { rootUrl } from '../../index';
 import {
   authedUserActions,
   appointmentActions,
-  waitingTimeActions
+  waitingTimeActions,
+  commonActions
 } from '../state/ducks';
 import { formatDate } from '../utils/helpers';
 
@@ -26,12 +28,17 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.props.fetchUser().then(() => {
+    const { fetchUser, fetchStaticData } = this.props;
+    fetchUser().then(user => {
       this.setState({ first: false });
-      this.fetchInitialData();
-      this.dataPolling = setInterval(() => {
+      if (user.app == 'dashboard') {
         this.fetchInitialData();
-      }, 2000);
+        this.dataPolling = setInterval(() => {
+          this.fetchInitialData();
+        }, 2000);
+      } else {
+        fetchStaticData();
+      }
     });
   }
 
@@ -79,7 +86,8 @@ const mapStateToProps = ({ loadingBar }) => ({
 const mapDispatchToProps = {
   fetchUser: () => authedUserActions.handleFetchUser(),
   fetchAppointments: date => appointmentActions.handleFetchAppointments(date),
-  fetchWaitingTime: () => waitingTimeActions.handleFetchWaitingTime()
+  fetchWaitingTime: () => waitingTimeActions.handleFetchWaitingTime(),
+  fetchStaticData: () => commonActions.handleFetchStaticData()
 };
 
 library.add([
@@ -87,7 +95,8 @@ library.add([
   faExclamationTriangle,
   faHandshake,
   faCalendarTimes,
-  faCheckSquare
+  faCheckSquare,
+  faSignInAlt
 ]);
 
 export default connect(

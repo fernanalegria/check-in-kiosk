@@ -1,5 +1,6 @@
 from .doctors import DoctorsViewSet, DoctorWelcome
-from .patients import PatientsViewSet
-from .user import UserViewSet
+from .patients import PatientsViewSet, PatientAppointmentsViewSet
+from .user import UserViewSet, LoginView, LogoutView
 from .appointments import AppointmentsViewSet, WaitingTimeViewSet
-from .logout import LogOutViewSet
+from .setup import SetupView
+from .static import StaticView

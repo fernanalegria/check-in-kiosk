@@ -99,6 +99,7 @@ class BaseCreateModelMixin(mixins.CreateModelMixin, BaseMixin):
     """
 
     def create(self, request, *args, **kwargs):
+        self.logger.debug("create()")
         if hasattr(self, 'before_create_request'):
             self.before_create_request(request)
         url = self.url()
@@ -122,9 +123,9 @@ class BaseListModelMixin(mixins.ListModelMixin, BaseMixin):
     left_joins = []
 
     def list(self, request, *args, **kwargs):
+        self.logger.debug("list()")
         if hasattr(self, 'before_list_request'):
             self.before_list_request(request)
-        self.logger.debug("list()")
         url = self.url()
         self.auth_headers(kwargs, request.access_token)
         # Response will be one page out of a paginated results list
@@ -183,6 +184,7 @@ class BaseRetrieveModelMixin(mixins.RetrieveModelMixin, BaseMixin):
     """
 
     def retrieve(self, request, *args, **kwargs):
+        self.logger.debug("retrieve()")
         if hasattr(self, 'before_retrieve_request'):
             self.before_retrieve_request(request)
         pk = kwargs.pop('pk', None)
@@ -219,6 +221,7 @@ class BaseUpdateModelMixin(mixins.UpdateModelMixin, BaseMixin):
     """
 
     def update(self, request, *args, **kwargs):
+        self.logger.debug("update()")
         if hasattr(self, 'before_update_request'):
             self.before_update_request(request)
         pk = kwargs.pop('pk', None)
@@ -254,6 +257,7 @@ class BaseDestroyModelMixin(mixins.DestroyModelMixin, BaseMixin):
     """
 
     def destroy(self, request, *args, **kwargs):
+        self.logger.debug("destroy()")
         if hasattr(self, 'before_destroy_request'):
             self.before_destroy_request(request)
         url = self.url(kwargs['pk'])

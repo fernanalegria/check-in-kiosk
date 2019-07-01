@@ -3,7 +3,7 @@ import { ButtonToolbar } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { appointmentActions } from '../../../state/ducks';
 import { toast } from 'react-toastify';
-import ActionButton from './ActionButton';
+import ActionButton from '../../common/ActionButton';
 import './ActionsFormatter.scss';
 
 class ActionsFormatter extends Component {

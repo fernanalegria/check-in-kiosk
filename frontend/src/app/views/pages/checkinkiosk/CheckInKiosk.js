@@ -1,13 +1,18 @@
 import React, { Component, Fragment } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ActionsFormatter from './ActionsFormatter';
-import { computeWaitingTime } from '../../../utils/helpers';
+import SearchForm from './SearchForm';
+import CheckInModal from './CheckInModal';
 import { connect } from 'react-redux';
-import WaitingTimeForm from './WaitingTimeForm';
+import { isToday } from '../../../utils/helpers';
 
-class Appointments extends Component {
+/**
+ * Kiosks that allows patients to check in upon arrival
+ */
+class CheckInKiosk extends Component {
   constructor() {
     super();
+    this.state = { modalShow: false, appointmentId: null };
     this.columns = [
       {
         dataField: 'patient',
@@ -22,10 +27,6 @@ class Appointments extends Component {
         text: 'Status'
       },
       {
-        dataField: 'waitingTime',
-        text: 'Time in waiting room'
-      },
-      {
         dataField: 'actions',
         text: 'Actions',
         isDummyField: true,
@@ -35,31 +36,39 @@ class Appointments extends Component {
   }
 
   formatter = (cell, row) => (
-    <ActionsFormatter
-      appointment={row}
-      hasUncompletedSessions={this.hasUncompletedSessions}
-    />
+    <ActionsFormatter appointment={row} openModal={this.openModal} />
   );
 
-  hasUncompletedSessions = () => {
-    const { appointments } = this.props;
-    const uncompletedSessions = appointments.filter(
-      appointment => appointment.status === 'In Session'
-    );
-    return uncompletedSessions.length != 0;
+  openModal = appointmentId => {
+    this.setState({
+      modalShow: true,
+      appointmentId
+    });
   };
 
   render() {
     const { appointments } = this.props;
+    const { modalShow, appointmentId } = this.state;
     return (
       <Fragment>
+        <SearchForm />
         <BootstrapTable
           keyField="id"
           data={appointments}
           columns={this.columns}
           noDataIndication="No data found"
         />
-        <WaitingTimeForm />
+        {appointments.length > 0 && (
+          <CheckInModal
+            onHide={() => {
+              this.setState({
+                modalShow: false
+              });
+            }}
+            show={modalShow}
+            appointmentId={appointmentId}
+          />
+        )}
       </Fragment>
     );
   }
@@ -68,13 +77,13 @@ class Appointments extends Component {
 const mapStateToProps = ({ appointments }) => ({
   appointments: Object.values(appointments)
     .sort((a, b) => new Date(a.scheduled_time) - new Date(b.scheduled_time))
-    .map(({ id, status, patient, scheduled_time, updated_at }) => ({
+    .map(({ id, status, patient, scheduled_time }) => ({
       id,
       status: status ? status : 'Scheduled',
       patient: `${patient.first_name} ${patient.last_name}`,
       scheduledTime: scheduled_time.replace('T', ' '),
-      waitingTime: status === 'Arrived' ? computeWaitingTime(updated_at) : 'N/A'
+      isToday: isToday(scheduled_time)
     }))
 });
 
-export default connect(mapStateToProps)(Appointments);
+export default connect(mapStateToProps)(CheckInKiosk);

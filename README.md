@@ -43,8 +43,8 @@ app can set the appointment status to "Arrived" (Appointment API Docs).
 
 ### Requirements
 - a free [drchrono.com](https://www.drchrono.com/sign-up/) account
-- [Node.js](https://nodejs.org/en/) and [Yarn], which will help you install the node modules, i.e., our frontend dependencies
-- Python 3.7. The backend service is built on Django, a popular Python web framework.
+- [Node.js](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/lang/en/docs/install/), which will help you install the node modules, i.e., our frontend dependencies
+- [Python 3.7](https://www.python.org/downloads/). The backend service is built on Django, a popular Python web framework.
 
 
 #### API token 

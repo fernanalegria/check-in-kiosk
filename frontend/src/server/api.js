@@ -53,7 +53,7 @@ export const getApptsBySsn = (ssn, doctor) => {
 
 export const getApptsByPatientId = (patient, doctor) => {
   const url = new URL(`${rootUrl}/appointments/`);
-  const params = { patient, doctor };
+  const params = { patient, doctor, since: '0001-01-01' };
   return get(url, params);
 };
 

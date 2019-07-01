@@ -2,7 +2,9 @@ import * as types from './types';
 import {
   getAppointments,
   getApptsBySsn,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  updateDemographicInfo,
+  getApptsByPatientId
 } from '../../../../server/api';
 
 /**
@@ -73,11 +75,7 @@ export const handleCheckIn = (
 ) => (dispatch, getState) => {
   const { authedUser } = getState();
   return updateDemographicInfo(patientId, address, city, state, zipCode)
-    .then(() => {
-      updateAppointmentStatus(appointmentId, 'Arrived');
-    })
+    .then(() => updateAppointmentStatus(appointmentId, 'Arrived'))
     .then(() => getApptsByPatientId(patientId, authedUser.id))
-    .then(appointments => {
-      dispatch(receiveAppointments(appointments));
-    });
+    .then(appointments => dispatch(receiveAppointments(appointments)));
 };

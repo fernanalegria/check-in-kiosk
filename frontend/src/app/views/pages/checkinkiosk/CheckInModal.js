@@ -22,9 +22,10 @@ class CheckInModal extends Component {
     });
   }
 
-  handleSubmit = () => {
+  handleSubmit = e => {
+    e.preventDefault();
     const { address, city, state, zipCode } = this.state;
-    const { checkIn, patientId, appointmentId } = this.props;
+    const { checkIn, patientId, appointmentId, onHide } = this.props;
     checkIn(
       appointmentId,
       patientId,
@@ -32,7 +33,7 @@ class CheckInModal extends Component {
       city[0].city_name,
       state[0].state_code,
       zipCode
-    );
+    ).then(onHide);
   };
 
   onChange = e => {
